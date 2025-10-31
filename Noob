@@ -1,56 +1,116 @@
--- Tạo GUI
-local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local TextLabel = Instance.new("TextLabel")
-local Button = Instance.new("TextButton")
+--// GUI MozilOnTop có hiệu ứng ánh sáng + nút tròn ẩn/hiện GUI bằng hình mèo
 
-ScreenGui.Name = "DupeGUI"
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Xóa GUI cũ nếu có
+if game.CoreGui:FindFirstChild("MozilOnTopUI") then
+    game.CoreGui.MozilOnTopUI:Destroy()
+end
 
-Frame.Size = UDim2.new(0, 300, 0, 150)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
-Frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Frame.Parent = ScreenGui
+-- Tạo ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "MozilOnTopUI"
+gui.Parent = game.CoreGui
+gui.ResetOnSpawn = false
 
-TextLabel.Size = UDim2.new(1, 0, 0.5, 0)
-TextLabel.BackgroundTransparency = 1
-TextLabel.Text = "Ready"
-TextLabel.Font = Enum.Font.SourceSansBold
-TextLabel.TextSize = 28
-TextLabel.TextColor3 = Color3.new(1,1,1)
-TextLabel.Parent = Frame
+-- Khung chính
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 350, 0, 150)
+frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Parent = gui
+frame.Active = true
+frame.Draggable = true
 
-Button.Size = UDim2.new(1, 0, 0.5, 0)
-Button.Position = UDim2.new(0, 0, 0.5, 0)
-Button.Text = "DUPE"
-Button.Font = Enum.Font.SourceSansBold
-Button.TextSize = 26
-Button.TextColor3 = Color3.new(1,1,1)
-Button.BackgroundColor3 = Color3.fromRGB(255, 128, 0)
-Button.Parent = Frame
+-- Bo góc
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = frame
 
--- Hiệu ứng đếm %
-local isRunning = false
+-- Tiêu đề
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 50)
+title.BackgroundTransparency = 1
+title.Text = "MozilOnTop"
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Parent = frame
 
-Button.MouseButton1Click:Connect(function()
-	if isRunning then return end
-	isRunning = true
-	
-	local duration = 15
-	local startTime = tick()
-	
-	while tick() - startTime < duration do
-		local percent = math.floor(((tick() - startTime) / duration) * 100)
-		TextLabel.Text = percent .. "%"
-		wait(0.1)
-	end
-	
-	TextLabel.Text = "100%"
-	wait(0.5)
-	TextLabel.Text = "Done!"
-	
-	isRunning = false
-	
-	-- Thực hiện hành động sau khi hoàn tất
-	print("Đã hoàn tất quá trình DUPE (demo an toàn).")
+-- Trạng thái
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, 0, 0, 30)
+status.Position = UDim2.new(0, 0, 0, 50)
+status.BackgroundTransparency = 1
+status.Text = "Ready."
+status.Font = Enum.Font.Gotham
+status.TextColor3 = Color3.fromRGB(200, 200, 200)
+status.TextScaled = true
+status.Parent = frame
+
+-- Thanh ánh sáng
+local bar = Instance.new("Frame")
+bar.Size = UDim2.new(0.9, 0, 0, 35)
+bar.Position = UDim2.new(0.05, 0, 0.7, 0)
+bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+bar.BorderSizePixel = 0
+bar.Parent = frame
+
+local barCorner = Instance.new("UICorner")
+barCorner.CornerRadius = UDim.new(0, 10)
+barCorner.Parent = bar
+
+-- Gradient ánh sáng di chuyển
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+}
+gradient.Parent = bar
+
+task.spawn(function()
+    while true do
+        for i = 0, 1, 0.01 do
+            gradient.Offset = Vector2.new(i, 0)
+            task.wait(0.02)
+        end
+    end
 end)
+
+-- Text DUPE
+local dupe = Instance.new("TextLabel")
+dupe.Size = UDim2.new(1, 0, 1, 0)
+dupe.BackgroundTransparency = 1
+dupe.Text = "DUPE"
+dupe.Font = Enum.Font.GothamBold
+dupe.TextScaled = true
+dupe.TextColor3 = Color3.fromRGB(255, 255, 255)
+dupe.Parent = bar
+
+--// 🐱 Nút hình mèo đóng/mở GUI
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Name = "ToggleCatButton"
+toggleButton.Parent = gui
+toggleButton.Size = UDim2.new(0, 80, 0, 80)
+toggleButton.Position = UDim2.new(0.05, 0, 0.8, 0)
+toggleButton.BackgroundTransparency = 1
+toggleButton.Image = "rbxassetid://137566338679153"
+toggleButton.Active = true
+toggleButton.Draggable = true
+
+-- Hiệu ứng bo tròn (cho đẹp)
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(1, 0)
+buttonCorner.Parent = toggleButton
+
+-- Trạng thái ẩn/hiện
+local visible = true
+toggleButton.MouseButton1Click:Connect(function()
+    visible = not visible
+    frame.Visible = visible
+end)
+
+print("✅ MozilOnTop GUI + Cat Button loaded!")
