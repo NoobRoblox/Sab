@@ -1,0 +1,56 @@
+-- Tạo GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local Button = Instance.new("TextButton")
+
+ScreenGui.Name = "DupeGUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+Frame.Size = UDim2.new(0, 300, 0, 150)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+Frame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+Frame.Parent = ScreenGui
+
+TextLabel.Size = UDim2.new(1, 0, 0.5, 0)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = "Ready"
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.TextSize = 28
+TextLabel.TextColor3 = Color3.new(1,1,1)
+TextLabel.Parent = Frame
+
+Button.Size = UDim2.new(1, 0, 0.5, 0)
+Button.Position = UDim2.new(0, 0, 0.5, 0)
+Button.Text = "DUPE"
+Button.Font = Enum.Font.SourceSansBold
+Button.TextSize = 26
+Button.TextColor3 = Color3.new(1,1,1)
+Button.BackgroundColor3 = Color3.fromRGB(255, 128, 0)
+Button.Parent = Frame
+
+-- Hiệu ứng đếm %
+local isRunning = false
+
+Button.MouseButton1Click:Connect(function()
+	if isRunning then return end
+	isRunning = true
+	
+	local duration = 15
+	local startTime = tick()
+	
+	while tick() - startTime < duration do
+		local percent = math.floor(((tick() - startTime) / duration) * 100)
+		TextLabel.Text = percent .. "%"
+		wait(0.1)
+	end
+	
+	TextLabel.Text = "100%"
+	wait(0.5)
+	TextLabel.Text = "Done!"
+	
+	isRunning = false
+	
+	-- Thực hiện hành động sau khi hoàn tất
+	print("Đã hoàn tất quá trình DUPE (demo an toàn).")
+end)
