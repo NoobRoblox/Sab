@@ -58,7 +58,7 @@ titleBar.Parent = frame
 Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 10)
 
 local title = Instance.new("TextLabel")
-title.Text = "Sync Panel"
+title.Text = "Send link Panel"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -155,7 +155,7 @@ syncBtn.MouseButton1Click:Connect(function()
 	syncing = true
 
 	status.Text = "Status: 🟡 sending..."
-	syncBtn.Text = "Syncing..."
+	syncBtn.Text = "Sending..."
 	TweenService:Create(syncBtn, TweenInfo.new(0.3), {BackgroundTransparency = 0.4}):Play()
 
 	local totalTime = 30 -- 30 giây
